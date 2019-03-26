@@ -16,10 +16,10 @@ LIBRARY_PATHS = -LC:\MinGW\SDL32\lib
 #COMPILER_FLAGS = -w -Wl,-subsystem,windows
 
 #LINKER_FLAGS specifies the libraries we're linking against
-LINKER_FLAGS = -lmingw32 -lSDL2main -lSDL2
+LINKER_FLAGS = -lmingw32 -lSDL2main -lSDL2 -lopengl32 -lglu32 -lgdi32
 
 #OBJ_NAME specifies the name of our exectuable
-OBJ_NAME = program
+OBJ_NAME = game
 
 #This is the target that compiles our executable
 all : $(OBJS)

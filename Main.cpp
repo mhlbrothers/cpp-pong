@@ -1,3 +1,5 @@
+#include <iostream>
+#include <ctime>
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <GL\GLU.h>
@@ -11,7 +13,20 @@ SDL_Window* Window = NULL;
 
 SDL_GLContext glContext;
 
-bool renderQuad = true;
+float paddleSizeX = 10;
+float paddleSizeY = 100;
+
+float playerX = 20;
+float playerY = 480/2;
+
+float cpuX = 640-20;
+float cpuY = 480/2;
+
+float ballX = 640/2;
+float ballY = 480/2;
+float ballSize = 20;
+
+float oldtime, newtime, delta = 0;
 
 void init(){
     SDL_Init(SDL_INIT_VIDEO);
@@ -31,12 +46,16 @@ void init(){
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    glClearColor( 0.0f, 0.0f, 0.0f, 1.0f);  
+    glOrtho(0, 640, 480, 0, 0, 1000);
+
+    glClearColor( 0.0f, 0.0f, 0.0f, 1.0f);
+
+    
 }
 
 void handleKeys( unsigned char key, int x, int y){
     if( key == 'q') {
-        renderQuad = !renderQuad;
+        SDL_GL_SetSwapInterval(0);
     }
 }
 
@@ -45,16 +64,31 @@ void update(){
 }
 
 void render(){
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    if(renderQuad){
-        glBegin( GL_QUADS );
-			glVertex2f( -0.5f, -0.5f );
-			glVertex2f( 0.5f, -0.5f );
-			glVertex2f( 0.5f, 0.5f );
-			glVertex2f( -0.5f, 0.5f );
-		glEnd();
-    }
+    //Draw Player
+    glBegin( GL_QUADS );
+		glVertex2f( playerX-paddleSizeX/2.f, playerY-paddleSizeY/2.f );
+		glVertex2f( playerX+paddleSizeX/2.f, playerY-paddleSizeY/2.f );
+		glVertex2f( playerX+paddleSizeX/2.f, playerY+paddleSizeY/2.f );
+		glVertex2f( playerX-paddleSizeX/2.f, playerY+paddleSizeY/2.f );
+	glEnd();
+
+    //Draw CPU
+    glBegin( GL_QUADS );
+		glVertex2f( cpuX-paddleSizeX/2.f, cpuY-paddleSizeY/2.f );
+		glVertex2f( cpuX+paddleSizeX/2.f, cpuY-paddleSizeY/2.f );
+		glVertex2f( cpuX+paddleSizeX/2.f, cpuY+paddleSizeY/2.f );
+		glVertex2f( cpuX-paddleSizeX/2.f, cpuY+paddleSizeY/2.f );
+	glEnd();
+
+    //Draw Ball
+    glBegin( GL_QUADS );
+		glVertex2f( ballX-ballSize/2.f, ballY-ballSize/2.f );
+		glVertex2f( ballX+ballSize/2.f, ballY-ballSize/2.f );
+		glVertex2f( ballX+ballSize/2.f, ballY+ballSize/2.f );
+		glVertex2f( ballX-ballSize/2.f, ballY+ballSize/2.f );
+	glEnd();
 }
 
 void close(){
@@ -84,6 +118,16 @@ int main(int argc, char* args[]){
                 handleKeys(e.text.text[0], x, y);
             }
         }
+
+        int mouseX, mouseY;
+        SDL_GetMouseState(&mouseX, &mouseY);
+        playerY = mouseY;
+
+        ballX = ballX+1*delta*0000.1;
+
+        oldtime = newtime;
+        newtime = SDL_GetTicks();
+        delta = newtime - oldtime;
 
         render();
 

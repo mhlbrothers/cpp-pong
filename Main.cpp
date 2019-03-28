@@ -16,14 +16,17 @@ SDL_GLContext glContext;
 float paddleSizeX = 10;
 float paddleSizeY = 100;
 
-float playerX = 20;
+float playerX = 40;
 float playerY = 480/2;
 
-float cpuX = 640-20;
+float cpuX = 640-40;
 float cpuY = 480/2;
+float cpuMoveSpeed = 1.5f;
 
 float ballX = 640/2;
 float ballY = 480/2;
+float ballXV = 2.f;
+float ballYV = 2.f;
 float ballSize = 20;
 
 float oldtime, newtime, delta = 0;
@@ -119,18 +122,52 @@ int main(int argc, char* args[]){
             }
         }
 
+        //Mouse input
         int mouseX, mouseY;
         SDL_GetMouseState(&mouseX, &mouseY);
         playerY = mouseY;
 
-        ballX = ballX+1*delta*0000.1;
+        //Ball velocity
+        ballX = ballX+ballXV*delta;
+        ballY = ballY+ballYV*delta;
 
+        //Ball and wall collision
+        if(ballY > SCREEN_HEIGHT-ballSize/2.f){
+            ballYV = -2.f;
+        }
+        if(ballY < 0+ballSize/2.f){
+            ballYV = 2.f;
+        }
+        if(ballX > SCREEN_WIDTH-ballSize/2.f || ballX < 0+ballSize/2.f){
+            ballXV = -ballXV;
+        }
+
+        //Paddle and ball collision
+        if(ballY > playerY-paddleSizeY/2.f && ballY < playerY+paddleSizeY/2.f && ballX-ballSize/2.f < playerX+paddleSizeX/2.f){
+            ballXV = 2.f;
+        }
+        if(ballY > cpuY-paddleSizeY/2.f && ballY < cpuY+paddleSizeY/2.f && ballX+ballSize/2.f > cpuX-paddleSizeX/2.f){
+            ballXV = -2.f;
+        }
+
+        //CPU AI
+        if(ballY > cpuY){
+            cpuY = cpuY+cpuMoveSpeed*delta;
+        }
+        if(ballY < cpuY){
+            cpuY = cpuY-cpuMoveSpeed*delta;
+        }
+
+        std::cout << delta << std::endl;
+
+        //Delta calculations
         oldtime = newtime;
         newtime = SDL_GetTicks();
-        delta = newtime - oldtime;
+        delta = (newtime - oldtime)/7;
 
         render();
 
+        //Refresh window
         SDL_GL_SwapWindow(Window);
     }
 

@@ -23,7 +23,7 @@ void drawDigit(bool one, bool two, bool three, bool four, bool five, bool six, b
 		    glVertex2f( (x+hs)-thickness, y+vs/2.f );
 	    glEnd();
     }
-	if(three){
+	if(four){
         glBegin( GL_QUADS );
 		    glVertex2f( (x+hs)-thickness, y+vs/2.f );
 		    glVertex2f( x+hs, y+vs/2.f );
@@ -60,5 +60,32 @@ void drawDigit(bool one, bool two, bool three, bool four, bool five, bool six, b
 void drawNumber(int n, float vs, float hs, float thickness, float x, float y){
 	if(n == 1){
 		drawDigit(false, false, true, true, false, false, false, vs, hs, thickness, x, y);
+	}
+	if(n == 2){
+		drawDigit(false, true, true, false, true, true, true, vs, hs, thickness, x, y);
+	}
+	if(n == 3){
+		drawDigit(false, true, true, true, true, false, true, vs, hs, thickness, x, y);
+	}
+	if(n == 4){
+		drawDigit(true, false, true, true, false, false, true, vs, hs, thickness, x, y);
+	}
+	if(n == 5){
+		drawDigit(true, true, false, true, true, false, true, vs, hs, thickness, x, y);
+	}
+	if(n == 6){
+		drawDigit(true, true, false, true, true, true, true, vs, hs, thickness, x, y);
+	}
+	if(n == 7){
+		drawDigit(false, true, true, true, false, false, false, vs, hs, thickness, x, y);
+	}
+	if(n == 8){
+		drawDigit(true, true, true, true, true, true, true, vs, hs, thickness, x, y);
+	}
+	if(n == 9){
+		drawDigit(true, true, true, true, true, false, true, vs, hs, thickness, x, y);
+	}
+	if(n == 0){
+		drawDigit(true, true, true, true, true, true, false, vs, hs, thickness, x, y);
 	}
 }

@@ -19,6 +19,7 @@ float paddleSizeY = 100;
 
 float playerX = 40;
 float playerY = 480/2;
+int playerScore = 0;
 
 float cpuX = 640-40;
 float cpuY = 480/2;
@@ -102,8 +103,8 @@ void render(){
 		glVertex2f( ballX+ballSize/2.f, ballY+ballSize/2.f );
 		glVertex2f( ballX-ballSize/2.f, ballY+ballSize/2.f );
 	glEnd();
-
-    drawNumber(1, 50, 25, 2, 20, 20);
+    
+    drawNumber(playerScore, 50, 25, 2, 20, 20);
 }
 
 void close(){
@@ -169,6 +170,7 @@ int main(int argc, char* args[]){
 
         if(ballX > SCREEN_WIDTH-ballSize/2.f || ballX < 0+ballSize/2.f){
             ballXV = -ballXV;
+            playerScore++;
         }
 
         //Paddle and ball collision

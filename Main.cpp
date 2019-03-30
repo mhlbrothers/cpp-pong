@@ -5,6 +5,7 @@
 #include <GL\GLU.h>
 #include <stdio.h>
 #include <string>
+#include "digit.hpp"
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -21,15 +22,24 @@ float playerY = 480/2;
 
 float cpuX = 640-40;
 float cpuY = 480/2;
-float cpuMoveSpeed = 1.5f;
+float cpuMoveSpeed = 3.5f;
 
 float ballX = 640/2;
 float ballY = 480/2;
-float ballXV = 2.f;
-float ballYV = 2.f;
+float ballXV = 5.f;
+float ballYV = 5.f;
 float ballSize = 20;
 
+float offset = 0.2f;
+
+bool topDoOnce = true;
+bool bottomDoOnce = true;
+
 float oldtime, newtime, delta = 0;
+
+float clamp(float n, float lower, float upper){
+    return std::max( lower, std::min(n, upper) );
+}
 
 void init(){
     SDL_Init(SDL_INIT_VIDEO);
@@ -92,6 +102,8 @@ void render(){
 		glVertex2f( ballX+ballSize/2.f, ballY+ballSize/2.f );
 		glVertex2f( ballX-ballSize/2.f, ballY+ballSize/2.f );
 	glEnd();
+
+    drawNumber(1, 50, 25, 2, 20, 20);
 }
 
 void close(){
@@ -132,22 +144,41 @@ int main(int argc, char* args[]){
         ballY = ballY+ballYV*delta;
 
         //Ball and wall collision
-        if(ballY > SCREEN_HEIGHT-ballSize/2.f){
-            ballYV = -2.f;
+        if(ballY > SCREEN_HEIGHT-ballSize/2.f && topDoOnce){
+            ballYV = -ballYV;
+            topDoOnce = false;
         }
-        if(ballY < 0+ballSize/2.f){
-            ballYV = 2.f;
+        if(!(ballY > SCREEN_HEIGHT-ballSize/2.f)){
+            topDoOnce = true;
         }
+
+        if(ballY < 0+ballSize/2.f && topDoOnce){
+            ballYV = -ballYV;
+            bottomDoOnce = false;
+        }
+        if(!(ballY < 0+ballSize/2.f)){
+            bottomDoOnce = true;
+        }
+
+        /*if(ballY > SCREEN_HEIGHT-ballSize/2.f){
+            ballYV = -5.f;
+        }*/
+        /*if(ballY < 0+ballSize/2.f){
+            ballYV = 5.f;
+        }*/
+
         if(ballX > SCREEN_WIDTH-ballSize/2.f || ballX < 0+ballSize/2.f){
             ballXV = -ballXV;
         }
 
         //Paddle and ball collision
         if(ballY > playerY-paddleSizeY/2.f && ballY < playerY+paddleSizeY/2.f && ballX-ballSize/2.f < playerX+paddleSizeX/2.f){
-            ballXV = 2.f;
+            ballXV = 5.f;
+            ballYV = clamp( ((playerY-ballY)*offset)*-1, -5.f, 5.f);
         }
         if(ballY > cpuY-paddleSizeY/2.f && ballY < cpuY+paddleSizeY/2.f && ballX+ballSize/2.f > cpuX-paddleSizeX/2.f){
-            ballXV = -2.f;
+            ballXV = -5.f;
+            //ballYV = clamp( ((playerY-ballY)*offset)*-1, -5.f, 5.f);
         }
 
         //CPU AI
@@ -158,14 +189,16 @@ int main(int argc, char* args[]){
             cpuY = cpuY-cpuMoveSpeed*delta;
         }
 
-        std::cout << delta << std::endl;
+        std::cout << ballYV << std::endl;
 
         //Delta calculations
-        oldtime = newtime;
         newtime = SDL_GetTicks();
-        delta = (newtime - oldtime)/7;
+        delta = (newtime - oldtime)*0.1;
+        oldtime = newtime;
 
         render();
+
+        SDL_Delay(1);
 
         //Refresh window
         SDL_GL_SwapWindow(Window);
